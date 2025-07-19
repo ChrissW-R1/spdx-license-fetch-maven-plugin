@@ -4,6 +4,11 @@
 		  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
 	<servers>
 		<server>
+			<id>general-parent</id>
+			<username>github</username>
+			<password>${env.GITHUB_TOKEN}</password>
+		</server>
+		<server>
 			<id>project-repo</id>
 			<username>${env.GITHUB_ACTOR}</username>
 			<password>${env.GITHUB_TOKEN}</password>
