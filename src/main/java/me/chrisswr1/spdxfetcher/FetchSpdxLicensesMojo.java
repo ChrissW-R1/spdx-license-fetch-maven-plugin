@@ -104,8 +104,7 @@ public class FetchSpdxLicensesMojo extends AbstractMojo {
 				final @NotNull URL url = new URL(this.licensesUrl.replace("{license.id}", spdx));
 				final @Nullable Path filenamePath = Paths.get(url.getPath()).getFileName();
 				if (filenamePath == null) {
-					this.getLog().warn("Cloud not determine filename from URL: " + url.toString());
-					continue;
+					throw new IOException("Cloud not determine filename from URL: " + url.toString());
 				}
 				final @NotNull String filename = filenamePath.toString();
 				final @NotNull File outFile = new File(outputDirectory, filename);
