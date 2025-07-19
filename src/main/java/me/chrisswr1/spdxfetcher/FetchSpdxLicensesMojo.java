@@ -6,6 +6,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Set;
@@ -100,7 +102,12 @@ public class FetchSpdxLicensesMojo extends AbstractMojo {
 		for (String spdx : spdxSet) {
 			try {
 				final @NotNull URL url = new URL(this.licensesUrl.replace("{license.id}", spdx));
-				final @NotNull String filename = Paths.get(url.getPath()).getFileName().toString();
+				final @Nullable Path filenamePath = Paths.get(url.getPath()).getFileName();
+				if (filenamePath == null) {
+					this.getLog().warn("Cloud not determine filename from URL: " + url.toString());
+					continue;
+				}
+				final @NotNull String filename = filenamePath.toString();
 				final @NotNull File outFile = new File(outputDirectory, filename);
 				this.getLog().info("Downloading SPDX license: " + spdx);
 				final @NotNull InputStream in = url.openStream();
