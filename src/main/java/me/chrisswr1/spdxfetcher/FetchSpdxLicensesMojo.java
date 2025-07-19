@@ -11,6 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import proguard.annotation.Keep;
 import proguard.annotation.KeepName;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -34,24 +35,25 @@ import java.util.regex.Pattern;
 	defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
 	threadSafe = true
 )
+@Keep
 public class FetchSpdxLicensesMojo extends AbstractMojo {
-	@KeepName
 	@Parameter(
 		defaultValue = "${project.build.directory}/generated-resources/licenses.xml",
 		readonly = true
 	)
-	private File licensesFile;
 	@KeepName
+	private File licensesFile;
 	@Parameter(
 		defaultValue = "${project.build.directory}/generated-resources/spdx-licenses",
 		readonly = true
 	)
-	private File outputDirectory;
 	@KeepName
+	private File outputDirectory;
 	@Parameter(
 		defaultValue = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/{license.id}.txt",
 		readonly = true
 	)
+	@KeepName
 	private String licensesUrl;
 
 	private final Pattern SPDX_PATTERN = Pattern.compile("^.+ \\((?<spdx>[A-Z][\\w.\\-+]+)\\)$");

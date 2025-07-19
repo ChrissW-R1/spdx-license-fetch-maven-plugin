@@ -1,81 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>me.chrisswr1</groupId>
-        <artifactId>java-parent</artifactId>
-        <version>2.4.0</version>
-    </parent>
+	<parent>
+		<groupId>me.chrisswr1</groupId>
+		<artifactId>java-parent</artifactId>
+		<version>2.4.0</version>
+	</parent>
 
-    <!-- project identifier -->
-    <artifactId>spdx-license-fetch-plugin</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>maven-plugin</packaging>
+	<!-- project identifier -->
+	<artifactId>spdx-license-fetch-plugin</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>maven-plugin</packaging>
 
-    <properties>
-        <!-- technically-based properties -->
-        <project.module-root.relativedir>./</project.module-root.relativedir>
+	<properties>
+		<!-- technically-based properties -->
+		<project.module-root.relativedir>./</project.module-root.relativedir>
 
-        <!-- dependency versions -->
-        <maven.version>3.9.11</maven.version>
+		<!-- dependency versions -->
+		<maven.version>3.9.11</maven.version>
 
-        <!-- plugin versions -->
-        <plugin.plugin.version>3.15.1</plugin.plugin.version>
-    </properties>
+		<!-- plugin versions -->
+		<plugin.plugin.version>3.15.1</plugin.plugin.version>
+	</properties>
 
-    <repositories>
-        <repository>
-            <id>general-parent</id>
-            <name>General Parent</name>
-            <url>https://maven.pkg.github.com/ChrissW-R1/general-parent</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>general-parent</id>
+			<name>General Parent</name>
+			<url>https://maven.pkg.github.com/ChrissW-R1/general-parent</url>
+		</repository>
+	</repositories>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>${maven.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugin-tools</groupId>
-            <artifactId>maven-plugin-annotations</artifactId>
-            <version>${plugin.plugin.version}</version>
-        </dependency>
-        <!--dependency>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-            <version>2.6.0</version>
-        </dependency-->
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+			<version>${maven.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugin-tools</groupId>
+			<artifactId>maven-plugin-annotations</artifactId>
+			<version>${plugin.plugin.version}</version>
+		</dependency>
+	</dependencies>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-plugin-plugin</artifactId>
-                    <version>${plugin.plugin.version}</version>
-                    <configuration>
-                        <goalPrefix>spdx-fetch</goalPrefix>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-descriptor</id>
-                        <goals>
-                            <goal>descriptor</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-plugin-plugin</artifactId>
+					<version>${plugin.plugin.version}</version>
+					<configuration>
+						<goalPrefix>spdx-fetch</goalPrefix>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.github.wvengen</groupId>
+					<artifactId>proguard-maven-plugin</artifactId>
+					<configuration>
+						<options combine.children="append">
+							<option>-libraryjars ${java.home}/jmods/java.xml.jmod</option>
+						</options>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-descriptor</id>
+						<goals>
+							<goal>descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
