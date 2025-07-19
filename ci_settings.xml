@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0"
+		  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+	<servers>
+		<server>
+			<id>project-repo</id>
+			<username>${env.GITHUB_ACTOR}</username>
+			<password>${env.GITHUB_TOKEN}</password>
+		</server>
+		<server>
+			<id>project-site-repo</id>
+			<username>mvnsiteuploader</username>
+			<password>${env.mvnsiteuploader_password}</password>
+		</server>
+		<server>
+			<id>gpg.passphrase</id>
+			<passphrase>${env.gpg_passphrase}</passphrase>
+		</server>
+		<server>
+			<id>nvd.apikey</id>
+			<password>${env.nvd_api_key}</password>
+		</server>
+	</servers>
+
+	<profiles>
+		<profile>
+			<id>gpg-key</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<gpg.keyname>${env.gpg_keyid}</gpg.keyname>
+			</properties>
+		</profile>
+	</profiles>
+</settings>
