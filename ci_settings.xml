@@ -5,13 +5,13 @@
 	<servers>
 		<server>
 			<id>general-parent</id>
-			<username>github</username>
+			<username>${env.GITHUB_ACTOR}</username>
 			<password>${env.GITHUB_TOKEN}</password>
 		</server>
 		<server>
 			<id>project-repo</id>
 			<username>${env.GITHUB_ACTOR}</username>
-			<password>${env.GITHUB_TOKEN}</password>
+			<password>${env.GITHUB_DEPLOY_TOKEN}</password>
 		</server>
 		<server>
 			<id>project-site-repo</id>
