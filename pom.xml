@@ -18,6 +18,7 @@
 	<properties>
 		<!-- technically-based properties -->
 		<project.module-root.relativedir>./</project.module-root.relativedir>
+		<project.module-root.artifactId>spdx-license-fetch-plugin</project.module-root.artifactId>
 
 		<!-- dependency versions -->
 		<maven.version>3.9.11</maven.version>
