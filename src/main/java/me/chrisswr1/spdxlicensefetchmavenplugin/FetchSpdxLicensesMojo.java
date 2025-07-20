@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 
 @Mojo(
 	name = "fetch-spdx-licenses",
-	defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
+	defaultPhase = LifecyclePhase.PROCESS_RESOURCES,
 	threadSafe = true
 )
 @Keep
