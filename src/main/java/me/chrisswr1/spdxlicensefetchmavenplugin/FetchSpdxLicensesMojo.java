@@ -1,4 +1,4 @@
-package me.chrisswr1.spdxlicensefetchplugin;
+package me.chrisswr1.spdxlicensefetchmavenplugin;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
