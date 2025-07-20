@@ -1,2 +1,3 @@
-# spdx-license-fetch-plugin
+# SPDX License Fetch Maven Plugin
+
 Maven Plugin to extract and download clean SPDX licenses
