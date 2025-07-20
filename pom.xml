@@ -36,6 +36,20 @@
 		<plugin.plugin.version>3.15.1</plugin.plugin.version>
 	</properties>
 
+	<scm>
+		<url>https://github.com/${project.organization.name}/${project.module-root.artifactId}</url>
+		<connection>scm:git:${project.scm.url}.git</connection>
+		<developerConnection>${project.scm.connection}</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
+	<distributionManagement>
+		<site>
+			<id>project-site-repo</id>
+			<url>${project.site.deploy.url}</url>
+		</site>
+	</distributionManagement>
+
 	<repositories>
 		<repository>
 			<id>general-parent</id>
