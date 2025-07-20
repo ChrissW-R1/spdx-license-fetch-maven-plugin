@@ -151,4 +151,30 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>attach-docs-and-sources</id>
+			<activation>
+				<property>
+					<name>fullBuild</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

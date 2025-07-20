@@ -11,7 +11,7 @@
 		<server>
 			<id>project-repo</id>
 			<username>${env.GITHUB_ACTOR}</username>
-			<password>${env.DEPLOY_TOKEN}</password>
+			<password>${env.GITHUB_TOKEN}</password>
 		</server>
 		<server>
 			<id>project-site-repo</id>
