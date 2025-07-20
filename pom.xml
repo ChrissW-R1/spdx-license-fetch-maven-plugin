@@ -12,14 +12,14 @@
 
 	<!-- project identifier -->
 	<groupId>me.chrissw-r1</groupId>
-	<artifactId>spdx-license-fetch-plugin</artifactId>
+	<artifactId>spdx-license-fetch-maven-plugin</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<properties>
 		<!-- technically-based properties -->
 		<project.module-root.relativedir>./</project.module-root.relativedir>
-		<project.module-root.artifactId>spdx-license-fetch-plugin</project.module-root.artifactId>
+		<project.module-root.artifactId>spdx-license-fetch-maven-plugin</project.module-root.artifactId>
 		<mainClass.localPath>FetchSpdxLicensesMojo</mainClass.localPath>
 
 		<!-- dependency versions -->
