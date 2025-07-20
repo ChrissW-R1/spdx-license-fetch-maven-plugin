@@ -44,7 +44,6 @@ jobs:
                 run:  mvn -B clean deploy site-deploy -Dexecutable -DfullBuild -s ci_settings.xml --file pom.xml
                 env:
                     GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
-                    DEPLOY_TOKEN:             ${{ secrets.DEPLOY_TOKEN }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
                     gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
                     gpg_keyid:                ${{ secrets.GPG_KEYID }}

@@ -44,7 +44,6 @@ jobs:
                 run:  mvn -B clean release:prepare release:perform -Dexecutable -DfullBuild -s ci_settings.xml --file pom.xml -Dusername=${ci_git_user} -Dpassword=${GITHUB_TOKEN}
                 env:
                     GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
-                    DEPLOY_TOKEN:             ${{ secrets.DEPLOY_TOKEN }}
                     ci_git_user:              ${{ env.CI_GIT_USER }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
                     gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
