@@ -93,7 +93,7 @@ public class FetchSpdxLicensesMojo extends AbstractMojo {
 					}
 				}
 			}
-		} catch (IOException | SAXException | ParserConfigurationException e) {
+		} catch (final @NotNull IOException | SAXException | ParserConfigurationException e) {
 			throw new MojoExecutionException("Failed to parse licenses.xml", e);
 		}
 
@@ -113,7 +113,7 @@ public class FetchSpdxLicensesMojo extends AbstractMojo {
 				this.getLog().info("Downloading SPDX license: " + spdx);
 				final @NotNull InputStream in = url.openStream();
 				Files.copy(in, outFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
+			} catch (final @NotNull IOException e) {
 				this.getLog().warn("Failed to download SPDX text for " + spdx + ": " + e.getMessage());
 			}
 		}
