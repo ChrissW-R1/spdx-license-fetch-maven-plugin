@@ -41,7 +41,7 @@ jobs:
                     gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
             -
                 name: Build with Maven
-                run:  mvn -B clean deploy site-deploy -Dexecutable -DfullBuild -s ci_settings.xml --file pom.xml
+                run:  mvn -B clean deploy site-deploy -e -Dexecutable -DfullBuild -s ci_settings.xml --file pom.xml
                 env:
                     GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
