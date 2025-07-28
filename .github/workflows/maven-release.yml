@@ -41,7 +41,7 @@ jobs:
                     gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
             -
                 name: Build with Maven
-                run:  mvn -B clean release:prepare release:perform -e -Dexecutable -DfullBuild -s ci_settings.xml --file pom.xml -Dusername=${ci_git_user} -Dpassword=${GITHUB_TOKEN}
+                run:  mvn -B clean release:prepare release:perform -e -DfullBuild -Ddistribution -Dexecutable -s ci_settings.xml --file pom.xml -Dusername=${ci_git_user} -Dpassword=${GITHUB_TOKEN}
                 env:
                     GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
                     ci_git_user:              ${{ env.CI_GIT_USER }}
