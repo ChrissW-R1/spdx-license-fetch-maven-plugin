@@ -21,7 +21,36 @@
 	<description>
 		Maven Plugin to extract and download clean SPDX licenses
 	</description>
+	<url>${project.site.baseUrl}/${project.site.urlPath}</url>
 	<inceptionYear>2025</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>${license.signature}</name>
+			<url>${license.url}</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>ChrissW-R1</id>
+			<name>ChrissW-R1</name>
+			<email>contact@ChrissW-R1.me</email>
+			<url>https://ChrissW-R1.me</url>
+			<timezone>Europe/Berlin</timezone>
+			<roles>
+				<role>manager</role>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<properties>
+				<picUrl>
+					https://www.gravatar.com/avatar/625826a28e0cb12855ef6f5d169f8b67
+				</picUrl>
+			</properties>
+		</developer>
+	</developers>
 
 	<properties>
 		<!-- technically-based properties -->
