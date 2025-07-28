@@ -11,7 +11,7 @@
 	<!-- project identifier -->
 	<groupId>me.chrissw-r1</groupId>
 	<artifactId>spdx-license-fetch-maven-plugin</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<!-- project metadata -->
@@ -67,7 +67,7 @@
 		<url>https://github.com/${project.organization.name}/${project.module-root.artifactId}</url>
 		<connection>scm:git:${project.scm.url}.git</connection>
 		<developerConnection>${project.scm.connection}</developerConnection>
-		<tag>1.0.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
