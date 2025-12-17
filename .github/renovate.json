@@ -1,0 +1,38 @@
+{
+	"$schema":            "https://docs.renovatebot.com/renovate-schema.json",
+	"extends":            [
+		"config:recommended"
+	],
+	"enabledManagers":    [
+		"maven"
+	],
+	"labels":             [
+		"dependencies",
+		"renovate"
+	],
+	"packageRules":       [
+		{
+			"matchBaseBranchesPattern": "/^version\/eol\/[^\/]+$/",
+			"enabled": true,
+			"updateTypes": ["patch"]
+		},
+		{
+			"matchBaseBranchesPattern": "/^version\/[^\/]+$/",
+			"enabled": true
+		},
+		{
+			"matchBaseBranchesPattern": "/^(?!version\/[^\/]+$)(?!version\/eol\/[^\/]+$).*/",
+			"enabled": false
+		},
+		{
+			"matchManagers":        [
+				"maven"
+			],
+			"matchPackagePatterns": [
+				"^org\\.apache\\.maven\\.plugins:"
+			],
+			"groupName":            "Maven Plugins",
+			"separateMinorPatch":   true
+		}
+	]
+}
