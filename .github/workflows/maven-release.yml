@@ -4,11 +4,15 @@ name: Maven - Release Build
 
 # Controls when the action will run.
 on:
-    # Triggers the workflow on push or pull request events but only for version branches
+    # Triggers the workflow on push events but only for version branches
     push:
         branches: ["version/release/*"]
-    pull_request:
-        branches: ["version/release/*"]
+
+# Allows to push, create PRs and upload to Maven repository with the GITHUB_TOKEN
+permissions:
+    contents:      write
+    packages:      write
+    pull-requests: write
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -20,17 +24,20 @@ jobs:
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-            -
+            -   id:   checkout
                 name: Git Checkout
-                uses: actions/checkout@v4
-            -
-                name: Setup git user
+                uses: actions/checkout@v5
+                with:
+                    fetch-depth: 0
+                    fetch-tags:  true
+            -   id:   setup_git
+                name: Setup Git user
                 run:  |
-                      git config --global user.name "ChrissW-R1"
-                      git config --global user.email "contact@ChrissW-R1.me"
-            -
+                      git config --global user.name  "github-actions[bot]"
+                      git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            -   id:   setup_java
                 name: Setup JDK 11
-                uses: actions/setup-java@v4
+                uses: actions/setup-java@v5
                 with:
                     distribution:    'temurin'
                     java-version:    '11'
@@ -39,14 +46,166 @@ jobs:
                     settings-path:   ${{ github.workspace }} # location for the settings.xml file
                     gpg-passphrase:  'gpg_passphrase'
                     gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-            -
-                name: Build with Maven
-                run:  mvn -B clean release:prepare release:perform -e -DfullBuild -Ddistribution -Dexecutable -s ci_settings.xml --file pom.xml -Dusername=${ci_git_user} -Dpassword=${GITHUB_TOKEN}
+
+            -   id:   maven_release
+                name: Release with Maven
                 env:
                     GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
-                    ci_git_user:              ${{ env.CI_GIT_USER }}
+                    ci_git_user:              ${{ vars.CI_GIT_USER }}
+                    ossindex_user:            ${{ vars.OSSINDEX_USER }}
+                    ossindex_api_key:         ${{ secrets.OSSINDEX_API_KEY }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
                     gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
                     gpg_keyid:                ${{ secrets.GPG_KEYID }}
                     gpg_passphrase:           ${{ secrets.GPG_PASSPHRASE }}
                     mvnsiteuploader_password: ${{ secrets.MVNSITEUPLOADER_PASSWORD }}
+                    mvn_central_user:         ${{ secrets.MVN_CENTRAL_USER }}
+                    mvn_central_token:        ${{ secrets.MVN_CENTRAL_TOKEN }}
+                run:  |
+                      mvn -B \
+                      clean release:prepare release:perform \
+                      -e \
+                      -s ci_settings.xml --file pom.xml \
+                      -Darguments="-s ci_settings.xml -P central-deploy" \
+                      -DfullBuild -Ddistribution -Dexecutable \
+                      -P central-deploy \
+                      -Dusername=${ci_git_user} -Dpassword=${GITHUB_TOKEN}
+
+            -   id:   get_tag
+                name: Get latest tag
+                run:  echo "tag_name=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
+            -   id:   github_release
+                name: Create GitHub Release
+                uses: elgohr/Github-Release-Action@v5
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                with:
+                    title:      ${{ steps.get_tag.outputs.tag_name }}
+                    tag:        ${{ steps.get_tag.outputs.tag_name }}
+                    prerelease: false
+
+            -   id:                github_upload
+                name:              Upload artifacts to GitHub Release
+                working-directory: target/checkout
+                env:
+                    GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
+                    ci_git_user:              ${{ vars.CI_GIT_USER }}
+                    ossindex_user:            ${{ vars.OSSINDEX_USER }}
+                    ossindex_api_key:         ${{ secrets.OSSINDEX_API_KEY }}
+                    nvd_api_key:              ${{ secrets.NVD_API_KEY }}
+                    gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
+                    gpg_keyid:                ${{ secrets.GPG_KEYID }}
+                    gpg_passphrase:           ${{ secrets.GPG_PASSPHRASE }}
+                    mvnsiteuploader_password: ${{ secrets.MVNSITEUPLOADER_PASSWORD }}
+                    mvn_central_user:         ${{ secrets.MVN_CENTRAL_USER }}
+                    mvn_central_token:        ${{ secrets.MVN_CENTRAL_TOKEN }}
+                shell:             bash
+                run:               |
+                                   set -euo pipefail
+
+                                   TAG="${{ steps.get_tag.outputs.tag_name }}"
+                                   echo "Upload to GitHub release: $TAG"
+
+                                   SETTINGS_FILE="../../ci_settings.xml"
+
+                                   echo "::group::Prepare modules list"
+                                   ROOT_BUILD_DIR=$(mvn -B initialize help:evaluate -e -s $SETTINGS_FILE -Dexpression="project.build.directory" -Ddistribution -q -DforceStdout)
+                                   MODULES_LIST_FILENAME="modules-list.txt"
+                                   MODULES_LIST="$ROOT_BUILD_DIR/$MODULES_LIST_FILENAME"
+
+                                   MODULES=( "__ROOT__" )
+                                   if [[ -f "$MODULES_LIST" ]]; then
+                                     echo "Reading modules from: $MODULES_LIST"
+                                     while IFS= read -r MODULE || [[ -n "$MODULE" ]]; do
+                                       MODULES+=("$MODULE")
+                                     done < "$MODULES_LIST"
+                                   else
+                                        echo "No modules list found at: $MODULES_LIST"
+                                        echo "Using only default module: __ROOT__"
+                                   fi
+                                   echo "::endgroup::"
+
+                                   for MODULE in "${MODULES[@]}"; do
+                                     [[ -z "${MODULE//[$'\t\r\n ']/}" ]] && continue
+                                     [[ "${MODULE:0:1}" == "#" ]] && continue
+
+                                     echo "::group::Module: $MODULE"
+
+                                     if [[ "${MODULE}" == "__ROOT__" ]]; then
+                                       MODULE=""
+                                     fi
+
+                                     BUILD_DIR=$(mvn -B initialize help:evaluate -e -s $SETTINGS_FILE -Dexpression="project.build.directory" -Ddistribution -q -DforceStdout -pl "$MODULE")
+                                     FILENAME=$(mvn -B initialize help:evaluate -e -s $SETTINGS_FILE -Dexpression="project.build.artifact.fileName" -Ddistribution -q -DforceStdout -pl "$MODULE")
+                                     FINAL_NAME=$(mvn -B initialize help:evaluate -e -s $SETTINGS_FILE -Dexpression="project.build.finalName" -Ddistribution -q -DforceStdout -pl "$MODULE")
+
+                                     ARTIFACT_PATH=${BUILD_DIR}/${FILENAME}
+                                     echo "Uploading: $ARTIFACT_PATH"
+                                     gh release upload "$TAG" "$ARTIFACT_PATH" --clobber || echo "Upload of $ARTIFACT_PATH failed!"
+
+                                     echo "::endgroup::"
+                                   done
+
+            -   id:    derive_branches
+                name:  Derive version and branches
+                env:
+                    BRANCH: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+                shell: bash
+                run:   |
+                       set -euo pipefail
+
+                       RELEASE_BRANCH="$BRANCH"
+                       VERSION="${RELEASE_BRANCH##*/}"
+                       echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                       echo "release_branch=$RELEASE_BRANCH" >> "$GITHUB_OUTPUT"
+                       echo "version_branch=version/$VERSION" >> "$GITHUB_OUTPUT"
+            -   id:   pull_request
+                name: Create Pull Request to version branch
+                env:
+                    GITHUB_TOKEN:   ${{ secrets.GITHUB_TOKEN }}
+                    TAG:            ${{ steps.get_tag.outputs.tag_name }}
+                    VERSION_BRANCH: ${{ steps.derive_branches.outputs.version_branch }}
+                    RELEASE_BRANCH: ${{ steps.derive_branches.outputs.release_branch }}
+                run:  |
+                      set -euo pipefail
+
+                      gh pr create \
+                        --title "Release $TAG → $VERSION_BRANCH" \
+                        --body "Automated PR from release branch." \
+                        --base "$VERSION_BRANCH" \
+                        --head "$RELEASE_BRANCH" \
+                      || echo "PR may already exist."
+            -   id:                merge_main
+                name:              Merge tag into main branch
+                continue-on-error: true
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    TAG:          ${{ steps.get_tag.outputs.tag_name }}
+                run:               |
+                                   set -euo pipefail
+
+                                   echo "Fetch tag $TAG"
+                                   git fetch --tags --force
+                                   echo "Switch to main branch"
+                                   git switch -C main --track origin/main
+                                   git reset --hard origin/main
+
+                                   if ! git rev-parse "refs/tags/$TAG" >/dev/null 2>&1; then
+                                     echo "::error::Tag $TAG not found!"
+                                     exit 1
+                                   fi
+
+                                   if git merge-base --is-ancestor HEAD "refs/tags/$TAG"; then
+                                     if git merge --ff-only --no-edit --no-commit "refs/tags/$TAG"; then
+                                       echo "Tag $TAG merged to main branch."
+                                       git push origin HEAD:main
+                                       echo "Pushed changes to main branch."
+                                       exit 0
+                                     else
+                                       echo "::error::The tag $TAG couldn't be merged into the main branch!"
+                                       exit 1
+                                     fi
+                                   else
+                                     echo "::error::No fast-forward possible (diverged or unrelated histories)."
+                                     exit 1
+                                   fi
