@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>me.chrisswr1</groupId>
-		<artifactId>java-parent</artifactId>
-		<version>2.4.0</version>
+		<groupId>me.chrissw-r1</groupId>
+		<artifactId>maven-plugin-parent</artifactId>
+		<version>3.0.27</version>
 	</parent>
 
 	<!-- project identifier -->
-	<groupId>me.chrissw-r1</groupId>
 	<artifactId>spdx-license-fetch-maven-plugin</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<!-- project metadata -->
@@ -22,84 +23,12 @@
 	<url>${project.site.baseUrl}/${project.site.urlPath}</url>
 	<inceptionYear>2025</inceptionYear>
 
-	<licenses>
-		<license>
-			<name>${license.signature}</name>
-			<url>${license.url}</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
-	<developers>
-		<developer>
-			<id>ChrissW-R1</id>
-			<name>ChrissW-R1</name>
-			<email>contact@ChrissW-R1.me</email>
-			<url>https://ChrissW-R1.me</url>
-			<timezone>Europe/Berlin</timezone>
-			<roles>
-				<role>manager</role>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-			<properties>
-				<picUrl>
-					https://www.gravatar.com/avatar/625826a28e0cb12855ef6f5d169f8b67
-				</picUrl>
-			</properties>
-		</developer>
-	</developers>
-
 	<properties>
 		<!-- technically-based properties -->
 		<project.module-root.relativedir>./</project.module-root.relativedir>
 		<project.module-root.artifactId>spdx-license-fetch-maven-plugin</project.module-root.artifactId>
 		<mainClass.localPath>FetchSpdxLicensesMojo</mainClass.localPath>
-
-		<!-- dependency versions -->
-		<maven.version>3.9.11</maven.version>
-
-		<!-- plugin versions -->
-		<plugin.plugin.version>3.15.1</plugin.plugin.version>
 	</properties>
-
-	<scm>
-		<url>https://github.com/${project.organization.name}/${project.module-root.artifactId}</url>
-		<connection>scm:git:${project.scm.url}.git</connection>
-		<developerConnection>${project.scm.connection}</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
-
-	<distributionManagement>
-		<site>
-			<id>project-site-repo</id>
-			<url>${project.site.deploy.url}</url>
-		</site>
-	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>general-parent</id>
-			<name>General Parent</name>
-			<url>https://maven.pkg.github.com/ChrissW-R1/general-parent</url>
-		</repository>
-	</repositories>
-
-	<dependencies>
-		<!-- provided dependencies -->
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-plugin-api</artifactId>
-			<version>${maven.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.maven.plugin-tools</groupId>
-			<artifactId>maven-plugin-annotations</artifactId>
-			<version>${plugin.plugin.version}</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -112,96 +41,7 @@
 						<goalPrefix>spdx-fetch</goalPrefix>
 					</configuration>
 				</plugin>
-				<plugin>
-					<groupId>com.github.wvengen</groupId>
-					<artifactId>proguard-maven-plugin</artifactId>
-					<configuration>
-						<options combine.children="append">
-							<option>-libraryjars ${java.home}/jmods/java.xml.jmod</option>
-						</options>
-					</configuration>
-				</plugin>
-				<plugin>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<executions>
-						<execution>
-							<id>restore-plugin-definition</id>
-							<phase>pre-integration-test</phase>
-							<goals>
-								<goal>run</goal>
-							</goals>
-							<configuration>
-								<target>
-									<exec executable="jar">
-										<arg value="uf" />
-										<arg value="${project.build.directory}/${project.build.finalName}.jar" />
-										<arg value="-C" />
-										<arg value="${project.build.outputDirectory}" />
-										<arg value="META-INF/maven/plugin.xml" />
-									</exec>
-								</target>
-							</configuration>
-						</execution>
-						<execution>
-							<id>restore-plugin-help</id>
-							<phase>pre-integration-test</phase>
-							<goals>
-								<goal>run</goal>
-							</goals>
-							<configuration>
-								<target>
-									<exec executable="jar">
-										<arg value="uf" />
-										<arg value="${project.build.directory}/${project.build.finalName}.jar" />
-										<arg value="-C" />
-										<arg value="${project.build.outputDirectory}" />
-										<arg value="META-INF/maven/${project.groupId}/${project.artifactId}/plugin-help.xml" />
-									</exec>
-								</target>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
 			</plugins>
 		</pluginManagement>
-		<plugins>
-			<plugin>
-				<artifactId>maven-plugin-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>default-descriptor</id>
-						<goals>
-							<goal>descriptor</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>attach-docs-and-sources</id>
-			<activation>
-				<property>
-					<name>fullBuild</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
