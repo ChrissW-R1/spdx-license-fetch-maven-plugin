@@ -36,9 +36,17 @@
 			<plugins>
 				<plugin>
 					<artifactId>maven-plugin-plugin</artifactId>
-					<version>${plugin.plugin.version}</version>
 					<configuration>
 						<goalPrefix>spdx-fetch</goalPrefix>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.github.wvengen</groupId>
+					<artifactId>proguard-maven-plugin</artifactId>
+					<configuration>
+						<libs combine.children="append">
+							<lib>${java.home}/jmods/java.xml.jmod</lib>
+						</libs>
 					</configuration>
 				</plugin>
 			</plugins>
