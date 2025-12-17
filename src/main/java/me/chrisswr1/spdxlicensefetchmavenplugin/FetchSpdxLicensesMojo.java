@@ -1,5 +1,6 @@
 package me.chrisswr1.spdxlicensefetchmavenplugin;
 
+import lombok.Getter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -38,35 +39,40 @@ import java.util.regex.Pattern;
 @Keep
 public class FetchSpdxLicensesMojo
 extends AbstractMojo {
+	private static final @NotNull Pattern SPDX_PATTERN = Pattern.compile(
+		"^.+ \\((?<spdx>[A-Z][\\w.\\-+]+)\\)$"
+	);
+
 	@Parameter(
 		defaultValue = "${project.build.directory}/generated-resources/licenses.xml",
 		readonly = true
 	)
 	@KeepName
+	@Getter
 	private @Nullable File   licensesFile;
 	@Parameter(
 		defaultValue = "${project.build.directory}/generated-resources/spdx-licenses",
 		readonly = true
 	)
 	@KeepName
+	@Getter
 	private @Nullable File   outputDirectory;
 	@Parameter(
 		defaultValue = "https://raw.githubusercontent.com/spdx/license-list-data/main/text/{license.id}.txt",
 		readonly = true
 	)
 	@KeepName
+	@Getter
 	private @Nullable String licensesUrl;
-
-	private final @NotNull Pattern SPDX_PATTERN = Pattern.compile(
-		"^.+ \\((?<spdx>[A-Z][\\w.\\-+]+)\\)$"
-	);
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		if (!licensesFile.exists()) {
+		final @Nullable File licensesFile = this.getLicensesFile();
+		if (licensesFile == null || !licensesFile.exists()) {
+			final @Nullable String licensesFilePath =
+				licensesFile == null ? "null" : licensesFile.getAbsolutePath();
 			this.getLog().error(
-				"licenses.xml not found: " +
-				licensesFile.getAbsolutePath()
+				"licenses.xml not found: " + licensesFilePath
 			);
 			return;
 		}
@@ -102,9 +108,8 @@ extends AbstractMojo {
 					final @NotNull String licenseName = nameNodes.item(
 						0
 					).getTextContent().trim();
-					final @NotNull Matcher matcher = SPDX_PATTERN.matcher(
-						licenseName
-					);
+					final @NotNull Matcher matcher =
+						FetchSpdxLicensesMojo.SPDX_PATTERN.matcher(licenseName);
 					if (matcher.matches()) {
 						final @NotNull String spdx = matcher.group(
 							"spdx"
@@ -129,6 +134,7 @@ extends AbstractMojo {
 			throw new MojoExecutionException("Failed to parse licenses.xml", e);
 		}
 
+		final @Nullable File outputDirectory = this.getOutputDirectory();
 		if (
 			outputDirectory == null ||
 			(!outputDirectory.exists() && !outputDirectory.mkdirs())
@@ -139,12 +145,13 @@ extends AbstractMojo {
 		}
 
 		for (final @NotNull String spdx : spdxSet) {
-			if (this.licensesUrl == null) {
+			final @Nullable String licensesUrl = this.getLicensesUrl();
+			if (licensesUrl == null) {
 				break;
 			}
 
 			try {
-				final @NotNull URL url = new URL(this.licensesUrl.replace(
+				final @NotNull URL url = new URL(licensesUrl.replace(
 					"{license.id}",
 					spdx
 				));
