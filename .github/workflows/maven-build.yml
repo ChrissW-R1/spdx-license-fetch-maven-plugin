@@ -29,7 +29,7 @@ jobs:
                 name: Git Checkout
                 uses: actions/checkout@v5
             -   id:   setup_git
-                name: Setup Git user
+                name: Setup Git
                 run:  |
                       git config --global user.name  "github-actions[bot]"
                       git config --global user.email "github-actions[bot]@users.noreply.github.com"
@@ -53,7 +53,6 @@ jobs:
                     ossindex_user:            ${{ vars.OSSINDEX_USER }}
                     ossindex_api_key:         ${{ secrets.OSSINDEX_API_KEY }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
-                    gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
                     gpg_keyid:                ${{ secrets.GPG_KEYID }}
                     mvnsiteuploader_password: ${{ secrets.MVNSITEUPLOADER_PASSWORD }}
                 run:  |

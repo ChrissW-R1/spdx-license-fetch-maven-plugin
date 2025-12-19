@@ -31,10 +31,14 @@ jobs:
                     fetch-depth: 0
                     fetch-tags:  true
             -   id:   setup_git
-                name: Setup Git user
+                name: Setup Git
                 run:  |
+                      echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
                       git config --global user.name  "github-actions[bot]"
                       git config --global user.email "github-actions[bot]@users.noreply.github.com"
+                      git config --global user.signingkey ${{ secrets.GPG_KEYID }}
+                      git config --global commit.gpgSign true
+                      git config --global tag.gpgSign true
             -   id:   setup_java
                 name: Setup JDK 11
                 uses: actions/setup-java@v5
@@ -56,7 +60,6 @@ jobs:
                     ossindex_user:            ${{ vars.OSSINDEX_USER }}
                     ossindex_api_key:         ${{ secrets.OSSINDEX_API_KEY }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
-                    gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
                     gpg_keyid:                ${{ secrets.GPG_KEYID }}
                     mvnsiteuploader_password: ${{ secrets.MVNSITEUPLOADER_PASSWORD }}
                     mvn_central_user:         ${{ secrets.MVN_CENTRAL_USER }}
@@ -90,15 +93,11 @@ jobs:
                 env:
                     GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
                     MAVEN_GPG_PASSPHRASE:     ${{ secrets.GPG_PASSPHRASE }}
-                    ci_git_user:              ${{ vars.CI_GIT_USER }}
                     ossindex_user:            ${{ vars.OSSINDEX_USER }}
                     ossindex_api_key:         ${{ secrets.OSSINDEX_API_KEY }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
-                    gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
                     gpg_keyid:                ${{ secrets.GPG_KEYID }}
                     mvnsiteuploader_password: ${{ secrets.MVNSITEUPLOADER_PASSWORD }}
-                    mvn_central_user:         ${{ secrets.MVN_CENTRAL_USER }}
-                    mvn_central_token:        ${{ secrets.MVN_CENTRAL_TOKEN }}
                 shell:             bash
                 run:               |
                                    set -euo pipefail
