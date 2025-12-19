@@ -3,6 +3,10 @@
 	"extends":            [
 		"config:recommended"
 	],
+	"baseBranchPatterns": [
+		"/^version\\/[^\\/]+$/",
+		"/^version\\/eol\\/[^\\/]+$/"
+	],
 	"enabledManagers":    [
 		"maven"
 	],
@@ -11,19 +15,6 @@
 		"renovate"
 	],
 	"packageRules":       [
-		{
-			"matchBaseBranchesPattern": "/^version\/eol\/[^\/]+$/",
-			"enabled": true,
-			"updateTypes": ["patch"]
-		},
-		{
-			"matchBaseBranchesPattern": "/^version\/[^\/]+$/",
-			"enabled": true
-		},
-		{
-			"matchBaseBranchesPattern": "/^(?!version\/[^\/]+$)(?!version\/eol\/[^\/]+$).*/",
-			"enabled": false
-		},
 		{
 			"matchManagers":        [
 				"maven"
