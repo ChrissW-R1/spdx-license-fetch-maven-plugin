@@ -4,11 +4,6 @@
 		  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
 	<servers>
 		<server>
-			<id>central</id>
-			<username>${env.mvn_central_user}</username>
-			<password>${env.mvn_central_token}</password>
-		</server>
-		<server>
 			<id>project-repo</id>
 			<username>${env.GITHUB_ACTOR}</username>
 			<password>${env.GITHUB_TOKEN}</password>
@@ -24,8 +19,9 @@
 			<password>${env.GITHUB_TOKEN}</password>
 		</server>
 		<server>
-			<id>gpg.passphrase</id>
-			<passphrase>${env.gpg_passphrase}</passphrase>
+			<id>central</id>
+			<username>${env.mvn_central_user}</username>
+			<password>${env.mvn_central_token}</password>
 		</server>
 		<server>
 			<id>ossindex</id>

@@ -51,13 +51,13 @@ jobs:
                 name: Release with Maven
                 env:
                     GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
+                    MAVEN_GPG_PASSPHRASE:     ${{ secrets.GPG_PASSPHRASE }}
                     ci_git_user:              ${{ vars.CI_GIT_USER }}
                     ossindex_user:            ${{ vars.OSSINDEX_USER }}
                     ossindex_api_key:         ${{ secrets.OSSINDEX_API_KEY }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
                     gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
                     gpg_keyid:                ${{ secrets.GPG_KEYID }}
-                    gpg_passphrase:           ${{ secrets.GPG_PASSPHRASE }}
                     mvnsiteuploader_password: ${{ secrets.MVNSITEUPLOADER_PASSWORD }}
                     mvn_central_user:         ${{ secrets.MVN_CENTRAL_USER }}
                     mvn_central_token:        ${{ secrets.MVN_CENTRAL_TOKEN }}
@@ -89,13 +89,13 @@ jobs:
                 working-directory: target/checkout
                 env:
                     GITHUB_TOKEN:             ${{ secrets.GITHUB_TOKEN }}
+                    MAVEN_GPG_PASSPHRASE:     ${{ secrets.GPG_PASSPHRASE }}
                     ci_git_user:              ${{ vars.CI_GIT_USER }}
                     ossindex_user:            ${{ vars.OSSINDEX_USER }}
                     ossindex_api_key:         ${{ secrets.OSSINDEX_API_KEY }}
                     nvd_api_key:              ${{ secrets.NVD_API_KEY }}
                     gpg_key:                  ${{ secrets.GPG_PRIVATE_KEY }}
                     gpg_keyid:                ${{ secrets.GPG_KEYID }}
-                    gpg_passphrase:           ${{ secrets.GPG_PASSPHRASE }}
                     mvnsiteuploader_password: ${{ secrets.MVNSITEUPLOADER_PASSWORD }}
                     mvn_central_user:         ${{ secrets.MVN_CENTRAL_USER }}
                     mvn_central_token:        ${{ secrets.MVN_CENTRAL_TOKEN }}
