@@ -27,7 +27,7 @@ jobs:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             -   id:   checkout
                 name: Git Checkout
-                uses: actions/checkout@v5
+                uses: actions/checkout@v6
             -   id:   setup_git
                 name: Setup Git
                 run:  |
