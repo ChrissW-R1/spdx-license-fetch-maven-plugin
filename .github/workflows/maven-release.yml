@@ -8,24 +8,23 @@ on:
     push:
         branches: ["version/release/*"]
 
-# Allows to push, create PRs and upload to Maven repository with the GITHUB_TOKEN
-permissions:
-    contents:      write
-    packages:      write
-    pull-requests: write
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
     release:
         # The type of runner that the job will run on
         runs-on: ubuntu-latest
+        # Allows to push, create PRs and upload to Maven repository with the GITHUB_TOKEN
+        permissions:
+            contents:      write
+            packages:      write
+            pull-requests: write
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             -   id:   checkout
                 name: Git Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
                 with:
                     fetch-depth: 0
                     fetch-tags:  true
@@ -40,7 +39,7 @@ jobs:
                       git config --global tag.gpgSign true
             -   id:   setup_java
                 name: Setup JDK 11
-                uses: actions/setup-java@v5
+                uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
                 with:
                     distribution:    'temurin'
                     java-version:    '11'
@@ -78,7 +77,7 @@ jobs:
                 run:  echo "tag_name=$(git describe --tags --abbrev=0)" >> "$GITHUB_OUTPUT"
             -   id:   github_release
                 name: Create GitHub Release
-                uses: elgohr/Github-Release-Action@v5
+                uses: elgohr/Github-Release-Action@c5ea99036abb741a89f8bf1f2cd7fba845e3313a # v5
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 with:
@@ -105,6 +104,7 @@ jobs:
                                    echo "Upload to GitHub release: $TAG"
 
                                    SETTINGS_FILE="../../ci_settings.xml"
+                                   SIGNATURE_EXTENSION="asc"
 
                                    echo "::group::Prepare modules list"
                                    ROOT_BUILD_DIR=$(mvn -B initialize help:evaluate -e -s $SETTINGS_FILE -Dexpression="project.build.directory" -Ddistribution -q -DforceStdout)
@@ -138,8 +138,11 @@ jobs:
                                      FINAL_NAME=$(mvn -B initialize help:evaluate -e -s $SETTINGS_FILE -Dexpression="project.build.finalName" -Ddistribution -q -DforceStdout -pl "$MODULE")
 
                                      ARTIFACT_PATH=${BUILD_DIR}/${FILENAME}
+                                     SIGNATURE_PATH=${ARTIFACT_PATH}.${SIGNATURE_EXTENSION}
                                      echo "Uploading: $ARTIFACT_PATH"
                                      gh release upload "$TAG" "$ARTIFACT_PATH" --clobber || echo "Upload of $ARTIFACT_PATH failed!"
+                                     echo "Uploading signature: $SIGNATURE_PATH"
+                                     gh release upload "$TAG" "$SIGNATURE_PATH" --clobber || echo "Upload of $SIGNATURE_PATH failed!"
 
                                      echo "::endgroup::"
                                    done
