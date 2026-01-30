@@ -1,12 +1,16 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Maven - Release Build
+name:        Maven - Release Build
 
 # Controls when the action will run.
 on:
     # Triggers the workflow on push events but only for version branches
     push:
-        branches: ["version/release/*"]
+        branches: [
+            "version/release/*"
+        ]
+
+permissions: read-all
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -15,16 +19,21 @@ jobs:
         runs-on: ubuntu-latest
         # Allows to push, create PRs and upload to Maven repository with the GITHUB_TOKEN
         permissions:
+            actions:       read
             contents:      write
             packages:      write
             pull-requests: write
+            id-token:      write
+            attestations:  write
+        env:
+            RELEASE_ARTIFACTS_DIR: ${{ github.workspace }}/release-artifacts
 
         # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             -   id:   checkout
                 name: Git Checkout
-                uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
                 with:
                     fetch-depth: 0
                     fetch-tags:  true
@@ -39,7 +48,7 @@ jobs:
                       git config --global tag.gpgSign true
             -   id:   setup_java
                 name: Setup JDK 17
-                uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
+                uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
                 with:
                     distribution:    'temurin'
                     java-version:    '17'
@@ -106,6 +115,8 @@ jobs:
                                    SETTINGS_FILE="../../ci_settings.xml"
                                    SIGNATURE_EXTENSION="asc"
 
+                                   mkdir -p "${RELEASE_ARTIFACTS_DIR}"
+
                                    echo "::group::Prepare modules list"
                                    ROOT_BUILD_DIR=$(mvn -B initialize help:evaluate -e -s $SETTINGS_FILE -Dexpression="project.build.directory" -Ddistribution -q -DforceStdout)
                                    MODULES_LIST_FILENAME="modules-list.txt"
@@ -139,9 +150,11 @@ jobs:
 
                                      ARTIFACT_PATH=${BUILD_DIR}/${FILENAME}
                                      SIGNATURE_PATH=${ARTIFACT_PATH}.${SIGNATURE_EXTENSION}
-                                     echo "Uploading: $ARTIFACT_PATH"
+                                     echo "Uploading artifact: $ARTIFACT_PATH"
+                                     cp "$ARTIFACT_PATH" "${RELEASE_ARTIFACTS_DIR}/"
                                      gh release upload "$TAG" "$ARTIFACT_PATH" --clobber || echo "Upload of $ARTIFACT_PATH failed!"
                                      echo "Uploading signature: $SIGNATURE_PATH"
+                                     cp "$SIGNATURE_PATH" "${RELEASE_ARTIFACTS_DIR}/"
                                      gh release upload "$TAG" "$SIGNATURE_PATH" --clobber || echo "Upload of $SIGNATURE_PATH failed!"
 
                                      echo "::endgroup::"
@@ -210,3 +223,32 @@ jobs:
                                      echo "::error::No fast-forward possible (diverged or unrelated histories)."
                                      exit 1
                                    fi
+
+            -   id:   create_attestation
+                name: Attest build run
+                uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3.2.0
+                with:
+                    subject-path: ${{ env.RELEASE_ARTIFACTS_DIR }}/**
+            -   id:   upload_provenance
+                name: Collect and upload provenance
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    TAG:      ${{ steps.get_tag.outputs.tag_name }}
+                    REPO:     ${{ github.repository }}
+                run:  |
+                      set -euo pipefail
+
+                      asset="$(find "${RELEASE_ARTIFACTS_DIR}" -type f | head -n 1)"
+                      echo "Download attestation of asset: ${asset}"
+                      gh attestation download "${asset}" --repo "${REPO}"
+
+                      attestation="$(ls -1 sha256:*.jsonl | head -n 1)"
+                      echo "Downloaded attestation: ${attestation}"
+
+                      REPO_NAME="${REPO##*/}"
+                      ASSET_NAME="${REPO_NAME}-${TAG}.intoto.jsonl"
+                      echo "Move attestation to ${ASSET_NAME}"
+                      mv "${attestation}" "${ASSET_NAME}"
+
+                      echo "Upload attestation as release asset"
+                      gh release upload "${TAG}" "${ASSET_NAME}" --clobber
