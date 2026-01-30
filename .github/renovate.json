@@ -1,14 +1,16 @@
 {
 	"$schema":            "https://docs.renovatebot.com/renovate-schema.json",
 	"extends":            [
-		"config:recommended"
+		"config:recommended",
+		"helpers:pinGitHubActionDigests"
 	],
 	"baseBranchPatterns": [
 		"/^version\\/[^\\/]+$/",
 		"/^version\\/eol\\/[^\\/]+$/"
 	],
 	"enabledManagers":    [
-		"maven"
+		"maven",
+		"github-actions"
 	],
 	"labels":             [
 		"dependencies",
@@ -24,6 +26,12 @@
 			],
 			"groupName":            "Maven Plugins",
 			"separateMinorPatch":   true
+		},
+		{
+			"matchManagers": [
+				"github-actions"
+			],
+			"groupName":     "GitHub Actions"
 		}
 	]
 }
