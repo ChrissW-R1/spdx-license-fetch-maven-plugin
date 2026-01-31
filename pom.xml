@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>me.chrissw-r1</groupId>
 		<artifactId>maven-plugin-parent</artifactId>
-		<version>3.0.47</version>
+		<version>3.0.48-SNAPSHOT</version>
 	</parent>
 
 	<!-- project identifier -->
@@ -27,19 +27,8 @@
 		<project.module-root.relativedir>./</project.module-root.relativedir>
 		<project.module-root.artifactId>spdx-license-fetch-maven-plugin</project.module-root.artifactId>
 		<mainClass.localPath>FetchSpdxLicensesMojo</mainClass.localPath>
-	</properties>
 
-	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-plugin-plugin</artifactId>
-					<configuration>
-						<goalPrefix>spdx-fetch</goalPrefix>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+		<!-- project-specific properties -->
+		<goalPrefix>spdx-fetch</goalPrefix>
+	</properties>
 </project>
