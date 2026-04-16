@@ -24,7 +24,6 @@
 
 	<properties>
 		<!-- technically-based properties -->
-		<project.module-root.relativedir>./</project.module-root.relativedir>
 		<project.module-root.artifactId>spdx-license-fetch-maven-plugin</project.module-root.artifactId>
 		<mainClass.localPath>FetchSpdxLicensesMojo</mainClass.localPath>
 
